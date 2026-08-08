@@ -11,7 +11,6 @@ Modify `config.py` to change parameters (e.g., integration step, noise variance,
 Assimilates noisy observations using a Stochastic EnKF. Calculates $T_{2\rightarrow1}$ from the ensemble covariance at each step.
 ```bash
 python run_simulation.py
-python plot_results.py
 ```
 
 ### 2. Time-Series Estimator

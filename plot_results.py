@@ -17,18 +17,30 @@ def main():
     df['t21_forecast_smooth'] = df['t21_forecast'].rolling(window=window_size).mean()
     df['t21_analysis_smooth'] = df['t21_analysis'].rolling(window=window_size).mean()
 
-    # The theoretical physical steady state for T_{2->1} from the paper
-    # (a12 * P12 / P11) -> 0.5 * (0.00125 / 0.005625) = 0.111111...
-    theoretical_steady_state = 0.111111
+    paper_reference_t21 = 0.111111
     
     plt.figure(figsize=(12, 6))
     
-    # Plot smoothed curves
-    plt.plot(df['step'], df['t21_forecast_smooth'], label='EnKF Forecast (Smoothed)', color='blue')
-    plt.plot(df['step'], df['t21_analysis_smooth'], label='EnKF Analysis (Smoothed)', color='green')
+    plt.plot(
+        df['step'],
+        df['t21_forecast_smooth'],
+        label='EnKF Forecast (100-step rolling mean)',
+        color='blue',
+    )
+    plt.plot(
+        df['step'],
+        df['t21_analysis_smooth'],
+        label='EnKF Analysis (100-step rolling mean)',
+        color='green',
+    )
     
     # Plot theoretical line
-    plt.axhline(y=theoretical_steady_state, color='red', linestyle='--', label='Theoretical Physical Steady State')
+    plt.axhline(
+        y=paper_reference_t21,
+        color='red',
+        linestyle='--',
+        label='Paper reference $T_{2\\rightarrow 1}=0.1111$',
+    )
     
     plt.title('Liang-Kleeman Information Transfer ($T_{2\\rightarrow 1}$) over time')
     plt.xlabel('Simulation Steps')
