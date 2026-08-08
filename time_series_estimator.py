@@ -7,7 +7,7 @@ from lk_metrics import calc_T2_to_1
 
 def calc_t21_from_trajectory(X: torch.Tensor) -> float:
     """
-    Calculates T_{2->1} using the simplistic formula by re-using 
+    Calculates T_{2->1} using the linear-model formula by re-using
     the core covariance and metrics functions.
     """
     if X.shape[0] < 2:
@@ -27,7 +27,7 @@ def plot_t21_convergence(steps: list, t21_values: list):
     plt.figure(figsize=(10, 6))
     
     # Plot estimator
-    plt.plot(steps, t21_values, label='Simplistic Formula ($a_{12} C_{12} / C_{11}$)', color='orange', linewidth=2)
+    plt.plot(steps, t21_values, label='Linear-model estimate ($a_{12} C_{12} / C_{11}$)', color='orange', linewidth=2)
     
     # Theoretical physical stationary state
     plt.axhline(y=config.THEORETICAL_STEADY_STATE, color='red', linestyle='--', label='Theoretical Physical Steady State')
