@@ -11,7 +11,7 @@
 
 ### 2. The Transient / Evolving Probability Papers
 *   **Carlos Pires (2024)**
-    *   *Title*: "Information Transfer in Chaotic Dynamics: Synergetics, Entropy Production, and Transient Behavior"
+    *   *Title*: "A general theory to estimate Information transfer in nonlinear systems"
 *   **Hagan, Vannitsem, & Dong (2019)**
     *   *Title*: "Time-Varying Information Transfer as a Measure of Causal Interactions"
     *   *Link*: [https://doi.org/10.1175/JCLI-D-18-0881.1](https://doi.org/10.1175/JCLI-D-18-0881.1)
