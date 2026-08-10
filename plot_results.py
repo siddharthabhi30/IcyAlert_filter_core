@@ -16,6 +16,8 @@ def main():
     window_size = 100
     df['t21_forecast_smooth'] = df['t21_forecast'].rolling(window=window_size).mean()
     df['t21_analysis_smooth'] = df['t21_analysis'].rolling(window=window_size).mean()
+    if 't21_momentum' in df.columns:
+        df['t21_momentum_smooth'] = df['t21_momentum'].rolling(window=window_size).mean()
 
     paper_reference_t21 = 0.111111
     
@@ -33,6 +35,13 @@ def main():
         label='EnKF Analysis (100-step rolling mean)',
         color='green',
     )
+    if 't21_momentum_smooth' in df.columns:
+        plt.plot(
+            df['step'],
+            df['t21_momentum_smooth'],
+            label='Momentum Covariance (100-step rolling mean)',
+            color='purple',
+        )
     
     # Plot theoretical line
     plt.axhline(

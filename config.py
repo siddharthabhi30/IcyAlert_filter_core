@@ -20,7 +20,8 @@ PROCESS_NOISE_VAR = 0.01  # Continuous variance Q
 OBS_NOISE_VAR = 0.02    # Observation noise R
 
 NUM_PARTICLES = 1000       # EnKF ensemble size
-BURN_IN_STEPS = 500       # Initial steps without observations
+BURN_IN_STEPS = 10000      # Initial steps without observations
+ALPHA = 0.99999
 SIM_STEPS = 20000         # Number of assimilation steps
 
 # ------------------------------------------------------------------------------

@@ -22,17 +22,33 @@ def main():
     # --------------------------------------------------------------------------
     # Burn-In Phase (Run process model without observing)
     # --------------------------------------------------------------------------
-    print(f"Running burn-in for {config.BURN_IN_STEPS} steps...")
-    for _ in range(config.BURN_IN_STEPS):
-        x_true = process_model(x_true)
-        x_ensemble = process_model(x_ensemble)
-        
-    print("Burn-in complete.")
-    
-    # --------------------------------------------------------------------------
-    # Assimilation & Measurement Phase
-    # --------------------------------------------------------------------------
+    burn_in_ensemble = torch.randn(
+        config.NUM_PARTICLES,
+        2,
+        dtype=config.DTYPE,
+        device=config.DEVICE,
+    )
     results = []
+
+    print(f"Running process-only burn-in for {config.BURN_IN_STEPS} steps...")
+    for step in range(config.BURN_IN_STEPS):
+        burn_in_ensemble = process_model(burn_in_ensemble)
+        cov = get_covariance(burn_in_ensemble)
+            
+        t21 = calc_T2_to_1(cov)
+        results.append({
+            "step": step - config.BURN_IN_STEPS,
+            "t21_forecast": t21,
+            "t21_analysis": t21,
+            "t21_momentum": t21,
+        })
+    
+    # ----------------------------------------------------------------------
+    # Assimilation phase
+    # ----------------------------------------------------------------------
+    x_ensemble = burn_in_ensemble.clone()
+    x_true = burn_in_ensemble[0:1].clone()
+    momentum_covariance = get_covariance(burn_in_ensemble)
     
     print(f"Running simulation for {config.SIM_STEPS} steps...")
     for step in range(config.SIM_STEPS):
@@ -49,6 +65,9 @@ def main():
         cov_forecast = get_covariance(x_forecast)
         t21_forecast = calc_T2_to_1(cov_forecast)
         
+        momentum_covariance = config.ALPHA * momentum_covariance + (1.0 - config.ALPHA) * cov_forecast
+        t21_momentum = calc_T2_to_1(momentum_covariance)
+        
         # 4. Analysis step: Update the ensemble with the observation
         x_analysis = enkf_update(x_forecast, y_obs)
         
@@ -60,7 +79,8 @@ def main():
         results.append({
             'step': step,
             't21_forecast': t21_forecast,
-            't21_analysis': t21_analysis
+            't21_analysis': t21_analysis,
+            't21_momentum': t21_momentum
         })
         
         # Update ensemble for the next time step
