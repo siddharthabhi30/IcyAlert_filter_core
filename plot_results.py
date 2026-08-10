@@ -51,6 +51,14 @@ def main():
         label='Paper reference $T_{2\\rightarrow 1}=0.1111$',
     )
     
+    # Plot vertical line for DA start
+    plt.axvline(
+        x=0,
+        color='black',
+        linestyle='--',
+        label='EnKF DA Starts',
+    )
+    
     plt.title('Liang-Kleeman Information Transfer ($T_{2\\rightarrow 1}$) over time')
     plt.xlabel('Simulation Steps')
     plt.ylabel('$T_{2\\rightarrow 1}$')
