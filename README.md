@@ -1,89 +1,65 @@
-# IcyAlert: EnKF and Information-Transfer Experiment
+# IcyAlert Covariance Experiment
 
-This repository tests how the Liang-Kleeman information-transfer metric ($T_{2\rightarrow1}$) behaves before and during Ensemble Kalman Filter (EnKF) assimilation.
+## Premise
 
-There are two experiments:
+Liang--Kleeman information transfer depends on the covariance structure of the system. This experiment tests what happens when the covariance supplied to the LK equation is the posterior covariance from data assimilation.
 
-1. reproduce the stationary $T_{2\rightarrow1}$ reference using a long process-model time series;
-2. compare forecast, posterior, and momentum covariance estimates during EnKF assimilation.
+Two equivalent filters are compared:
 
-Covariance momentum is an experimental diagnostic. It is not part of the EnKF update and is not yet a validated method for preserving physical causality.
+- an Ensemble Kalman Filter (EnKF), where covariance is estimated across ensemble members;
+- an analytical Kalman filter, where the covariance matrix is propagated directly.
 
-## ⚙️ Process Model (Particle Propagation)
+Both use the same process model. The observation variance $R$ is varied to control how strongly the filters trust observations.
 
-To propagate each particle, the experiment uses a **2D Stochastic Linear System** (from [Vannitsem et al., 2019](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019GL084329)). The model applies **Euler-Maruyama numerical integration** to advance the state according to the following equations:
+## Process model
 
-$$ dx_1 = (a_{11}x_1 + a_{12}x_2) dt + \text{noise} $$
-$$ dx_2 = (a_{21}x_1 + a_{22}x_2) dt + \text{noise} $$
+The process model is
 
-For this controlled experiment, the system is defined by the following exact parameters:
-* $a_{11} = -1.0$
-* $a_{12} = 0.5$ (The direct connection from $x_2 \rightarrow x_1$)
-* $a_{21} = 0.0$
-* $a_{22} = -1.0$
+```math
+dX_1=(a_{11}X_1+a_{12}X_2)\,dt+\sqrt{q}\,dW_1,
+```
 
-Additive stochastic noise is applied independently at each time step.
+```math
+dX_2=(a_{21}X_1+a_{22}X_2)\,dt+\sqrt{q}\,dW_2.
+```
 
-## 🔬 Experiments and Results
+with $a_{11}=a_{22}=-1$, $a_{12}=0.5$, $a_{21}=0$ (information flows only $2\rightarrow1$), process-noise variance $q=0.01$, and $dt=0.1$.
 
-### 1. Stationary time-series reference
+## Observation model
 
-`time_series_estimator.py` runs one stochastic process-model trajectory. After a 10,000-step burn-in, it collects 50,000 states and calculates covariance across time. The estimate converges towards the stationary reference $T_{2\rightarrow1}\approx0.1111$.
+```math
+y_t=HX_t+v_t,\qquad H=I,\qquad v_t\sim\mathcal{N}(0,R\,I).
+```
 
-### 2. EnKF experiment
+$X_t$ is the truth trajectory (the process model run once), and $R$ is the observation variance.
 
-`run_simulation.py` first advances a 1,000-member process-model ensemble for 10,000 steps without observations. It then runs 20,000 assimilation steps, observing both variables with $H=I$.
+## Information transfer
 
-At every assimilation step, it records $T_{2\rightarrow1}$ from:
+For this system, information transfer from $X_2$ to $X_1$ is
 
-- the forecast ensemble covariance;
-- the posterior ensemble covariance;
-- a momentum average of forecast covariances.
+```math
+T_{2\rightarrow1}(t)
+=a_{12}\frac{P_{12}(t)}{P_{11}(t)},
+\qquad a_{12}=0.5.
+```
 
-The posterior-covariance estimate drops away from the stationary reference after assimilation begins. This does not show that the underlying physical causality disappeared. It shows that $T_{2\rightarrow1}$ calculated from the posterior uncertainty covariance differs from the stationary process covariance in this experiment.
+The dashed curve in each figure is the process-only covariance reference, obtained without observation updates.
 
-The momentum covariance is
+## Results
 
-$$
-P^{\mathrm{mom}}_t
-=
-\alpha P^{\mathrm{mom}}_{t-1}
-+
-(1-\alpha)P^f_t,
-\qquad \alpha=0.99999.
-$$
+### Analytical Kalman filter
 
-It changes slowly because it retains almost all of its previous value. It is tracked only for comparison and is not used to update or resample the EnKF ensemble.
+![Analytical Kalman dynamic information transfer](./kalman_t21_vs_R.png)
 
-**Visualizations of these results:**
-* **[Transient vs. Stationary Analysis Plot](./timeseries_t21_convergence.png)**: Displays how the time-dependent transient rate $T_{2\rightarrow 1}(t)$ behaves relative to the asymptotic stationary climatological baseline.
-* **[Information Transfer ($T_{2\rightarrow 1}$) Plot](./t21_plot.png)**: Shows the continuous transient metric across the burn-in and assimilation phases.
+### Ensemble Kalman filter
 
-## 📁 Codebase Overview
+![EnKF dynamic information transfer](./enkf_t21_vs_R.png)
 
-* **`config.py`**: Centralizes configuration parameters, including the 2D SDE parameters, noise variances ($Q$, $R$), step sizes, and the momentum $\alpha$ constant.
-* **`process_model.py`**: Defines the forward integration of the 2D linear SDE state.
-* **`observation_model.py`**: Defines the observation operator ($y = Hx + v$).
-* **`enKF.py`**: Implements the stochastic Ensemble Kalman Filter update steps and covariance calculations.
-* **`lk_metrics.py`**: Calculates the Liang-Kleeman Information Transfer causality metric $T_{2\rightarrow 1} = a_{12} (P_{12} / P_{11})$.
-* **`run_simulation.py`**: Manages the 1000-member ensemble through the continuous burn-in and assimilation phases, and records all metrics to a CSV.
-* **`plot_results.py`**: Reads the output CSV and generates `t21_plot.png`. It applies a 100-step rolling window to smooth the noisy plot lines and marks the start of the DA phase.
-* **`time_series_estimator.py`**: Runs one long stochastic trajectory and calculates covariance across time to reproduce the stationary reference.
+Both methods behave the same: reducing $R$ contracts the posterior covariance and pushes $T_{2\rightarrow1}$ toward zero (the EnKF is noisier from finite-ensemble sampling). The posterior uncertainty covariance is a different object from the process covariance used by the reference LK calculation, and small observation noise compresses the structure that calculation needs.
 
-## 🚀 Usage
+## Run
 
-1. **Run the simulation**:
-   ```bash
-   python run_simulation.py
-   ```
-   This executes all 30,000 steps, outputs data to `results.csv`, and automatically generates the plots.
-
-2. **Generate the main plot manually**:
-   ```bash
-   python plot_results.py
-   ```
-
-3. **Run the stationary time-series reference**:
-   ```bash
-   python time_series_estimator.py
-   ```
+```bash
+python run_kalman_covariance.py
+python run_enkf_covariance.py
+```
