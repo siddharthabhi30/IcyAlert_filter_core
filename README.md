@@ -43,6 +43,8 @@ T_{2\rightarrow1}(t)
 \qquad a_{12}=0.5.
 ```
 
+Here, $P_{12}(t)$ is the covariance between $X_1$ and $X_2$, and $P_{11}(t)$ is the variance of $X_1$, at time $t$.
+
 The dashed curve in each figure is the process-only covariance reference, obtained without observation updates.
 
 ## Results
