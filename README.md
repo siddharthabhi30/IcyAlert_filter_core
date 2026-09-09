@@ -59,9 +59,20 @@ The dashed curve in each figure is the process-only covariance reference, obtain
 
 Both methods behave the same: reducing $R$ contracts the posterior covariance and pushes $T_{2\rightarrow1}$ toward zero (the EnKF is noisier from finite-ensemble sampling). The posterior uncertainty covariance is a different object from the process covariance used by the reference LK calculation, and small observation noise compresses the structure that calculation needs.
 
+## Forecast vs assimilated
+
+Assimilation happens at every step. At each time $t$ we plot the forecast $T_{2\rightarrow1}$, then assimilate. The covariance never reaches the ideal value — assimilation destroys it at every time $t$. Both curves stay well below the process-only value ($\approx 0.11$, the free run with no assimilation).
+
+![Forecast vs assimilated T21](./forecast_vs_assim_t21.png)
+
+One noise level, $R=0.05$: both settle around $0.06$, about halfway between the ideal $\approx 0.11$ and zero.
+
 ## Run
 
 ```bash
 python run_kalman_covariance.py
 python run_enkf_covariance.py
+python run_forecast_vs_assim.py
 ```
+
+Computing $T_{2\rightarrow1}$ with the tendency $dX$ written out explicitly converges to the same $a_{12}P_{12}/P_{11}$ value — see [enkf_dx_t21_vs_R.png](./enkf_dx_t21_vs_R.png) (`python run_dx_explicit.py`).

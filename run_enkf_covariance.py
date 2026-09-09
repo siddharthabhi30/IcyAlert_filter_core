@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import torch
 import config
 from process_model import process_model
+from observation_model import observation_model
 from enKF import enkf_update, get_covariance
 from kalman_covariance import F, Q
 
@@ -19,10 +20,13 @@ for R in R_VALUES:
     torch.manual_seed(0)
     config.OBS_NOISE_VAR = R
     ensemble = torch.randn(config.NUM_PARTICLES, 2, dtype=config.DTYPE)
+    x_true = torch.randn(1, 2, dtype=config.DTYPE)
     history = []
     for _ in range(STEPS):
+        x_true = process_model(x_true)
+        y_obs = observation_model(x_true).squeeze(0)   # truth + observation noise
         forecast = process_model(ensemble)
-        ensemble = enkf_update(forecast, torch.zeros(2, dtype=config.DTYPE))
+        ensemble = enkf_update(forecast, y_obs)
         P = get_covariance(ensemble)
         history.append((config.A12 * P[0, 1] / P[0, 0]).item())
     ax.plot(history, label=f"R={R}")
