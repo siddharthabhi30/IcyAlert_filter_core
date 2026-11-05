@@ -119,6 +119,8 @@ Swap $x$ and $y$ for $F_{x \to y}$.
 
 It only works for linear stochastic system [Need to search more to validate this claim of if DNN aided mechanism exists or not].
 
+Quote: "Another practice is performing a Granger causality test, which is a statistical test of the usefulness of one time series in forecasting another. This kind of test, as the name implies, provides only a yes-or-no judgment, lacking the quantitative information that may be required in many circumstances." ([Liang 2014](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.90.052150), Phys. Rev. E 90, 052150.)
+
 ## Liang-Kleeman
 
 TE and TLMI are heuristic. Quote: "The arguments given in Section 2 regarding the use of TLMI and TE as measures of uncertainty flow are essentially heuristic." ([Lecture 11](https://math.nyu.edu/~kleeman/infolect11.pdf), Section 4.)
