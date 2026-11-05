@@ -117,7 +117,7 @@ Swap $x$ and $y$ for $F_{x \to y}$.
 
 ### Notes
 
-It only works for linear stochastic system.
+It only works for linear stochastic system [Need to search more to validate this claim of if DNN aided mechanism exists or not].
 
 ## Liang-Kleeman
 
