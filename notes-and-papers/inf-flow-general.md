@@ -151,3 +151,11 @@ $$
 
 - Lecture 11, Section 4: https://math.nyu.edu/~kleeman/infolect11.pdf
 - Liang and Kleeman, Information transfer between dynamical system components, Phys. Rev. Lett. 95, 244101 (2005).
+
+## TODO: Neural Granger and transfer entropy papers
+
+- [ITENE: Intrinsic Transfer Entropy Neural Estimator](https://arxiv.org/abs/1912.07277), Zhang et al.: removes the synergistic part of transfer entropy; estimator inspired by MINE.
+- [TENDE: Transfer Entropy Neural Diffusion Estimation](https://arxiv.org/abs/2510.14096), Galeano Munoz et al.: score-based diffusion models to estimate transfer entropy through conditional mutual information.
+- [Neural Granger Causality](https://arxiv.org/abs/1802.05842), Tank et al.: structured MLPs or RNNs with sparsity penalties to recover Granger causal structure in nonlinear dynamics.
+- [Economy Statistical Recurrent Units For Inferring Nonlinear Granger Causality](https://arxiv.org/abs/1911.09879), Khanna and Tan: lighter recurrent network; Granger causality from structured sparsity of the weights.
+- [Interpretable Models for Granger Causality Using Self-explaining Neural Networks](https://arxiv.org/abs/2101.07600), Marcinkevičs and Vogt: self-explaining neural networks detect Granger causality in nonlinear time series.
